@@ -18,6 +18,6 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 echo "Changing permissions to all server files ..." >> $logfile
-chgrp watchers -v /media/watchers/* >> $logfile 2>&1
-chmod g+srw -v /media/watchers/* >> $logfile 2>&1
+chgrp watchers -v -R /media/watchers/* >> $logfile 2>&1
+chmod g+srw -v -R /media/watchers/* >> $logfile 2>&1
 echo "Permission script completed." >> $logfile
