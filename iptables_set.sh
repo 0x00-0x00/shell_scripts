@@ -1,6 +1,15 @@
 #!/bin/bash
 
-allow_ports=(22 25 80 8080 5222 9999)
+#Check if user is root as changing firewall settings are privileged actions.
+uid=$(id -u)
+
+if [ "$uid" != "0" ]; then
+	echo "You must have super-user privileges to run this script."
+	exit
+fi
+
+
+allow_ports=(22 25 80 443 8080 5222 9999)
 outgoing_only=(10000:65535)
 
 x=0
