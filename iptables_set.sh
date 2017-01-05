@@ -12,8 +12,12 @@ fi
 allow_ports=(22 25 80 443 8080 5222 9999)
 outgoing_only=(10000:65535)
 
+#Iterator variable
 x=0
-while [ "$x" != "4" ]; 
+
+#Number of ports to be allowed (n)
+y=7
+while [ "$x" != "$y" ]; 
 do
 	echo "Creating rules for port ${allow_ports[$x]} ..."; 
 	sudo iptables -A INPUT -p tcp --dport ${allow_ports[$x]} -j ACCEPT;
