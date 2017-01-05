@@ -34,19 +34,19 @@ echo "[*] Set $SWAP_SIZE mega-bytes to swap file."
 
 echo ""
 echo "[!] Creating swap file ..."
-dd if=/dev/zero of=$SWAP_LOCATION/$SWAP_FILENAME bs=$KB count=$REAL_SWAP_SIZE 2>&1 > /dev/null
+dd if=/dev/zero of=$SWAP_LOCATION/$SWAP_FILENAME bs=$KB count=$REAL_SWAP_SIZE > /dev/null 2>&1
 
 #Check if swap file exists.
 if [ -a $SWAP_LOCATION/$SWAP_FILE ]; then
 	echo "[*] Swap file created."
 	
 	echo "[*] Changing swap file permissions..."
-	chown root:root "$SWAP_LOCATION/$SWAP_FILE" 2>&1 > /dev/null
-	chmod 600 "$SWAP_LOCATION/$SWAP_FILE" 2>&1 > /dev/null
+	chown root:root "$SWAP_LOCATION/$SWAP_FILE" > /dev/null 2>&1
+	chmod 600 "$SWAP_LOCATION/$SWAP_FILE" > /dev/null 2>&1
 	echo "[*] Root permission set to swap file."
 
 	echo "[*] Converting file to swap ..."
-	mkswap "$SWAP_LOCATION/$SWAP_FILE" 2>&1 > /dev/null
+	mkswap "$SWAP_LOCATION/$SWAP_FILE" > /dev/null 2>&1
 	echo "[*] File converted to swap successfully."
 
 	echo "[*] Enabling swap file ..."
