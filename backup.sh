@@ -22,7 +22,7 @@ fi
 # Check arguments
 if [ "$1" == "" ]; then
 	echo "No arguments were supplied."
-	echo "Usage: $0 folder_to_compress/"
+	echo "Usage: $0 folder_to_compress output_file"
 	exit
 fi
 
@@ -33,6 +33,13 @@ if [ ! -d "$1" ]; then
 	exit 
 fi
 
+#Check if 2nd argument exists
+if [ "$2" == "" ]; then
+	echo "ERROR: You need to specify an output file."
+	echo "Usage: $0 $1 output_file"
+	exit
+fi
+
 
 #Compress it
-tar -cf - $1 -P | pv -s $(du -sb $1 | awk '{print $1}') | gzip > $1.tar.gz
+tar -cf - $1 -P | pv -s $(du -sb $1 | awk '{print $1}') | gzip > $2.tar.gz
