@@ -9,40 +9,51 @@ if [ "$uid" != "0" ]; then
 fi
 
 
-allow_ports=(22 25 80 443 8080 5222 9999)
+allow_ports=(22 25 80 443 5222)
 outgoing_only=(10000:65535)
 
+###################################
+#       LOOP CONFIGURATION        #
+###################################
 #Iterator variable
 x=0
 
 #Number of ports to be allowed (n)
-y=7
+y=5
 while [ "$x" != "$y" ]; 
 do
-	echo "Creating rules for port ${allow_ports[$x]} ..."; 
-	sudo iptables -A INPUT -p tcp --dport ${allow_ports[$x]} -j ACCEPT;
-	sudo iptables -A INPUT -p tcp --sport ${allow_ports[$x]} -j ACCEPT;
-	sudo iptables -A OUTPUT -p tcp --sport ${allow_ports[$x]} -j ACCEPT;
-	sudo iptables -A OUTPUT -p tcp --dport ${allow_ports[$x]} -j ACCEPT;
+	echo "[+] Creating rules for port ${allow_ports[$x]} ..."; 
+	iptables -A INPUT -p tcp --dport ${allow_ports[$x]} -j ACCEPT;
+	iptables -A INPUT -p tcp --sport ${allow_ports[$x]} -j ACCEPT;
+	iptables -A OUTPUT -p tcp --sport ${allow_ports[$x]} -j ACCEPT;
+	iptables -A OUTPUT -p tcp --dport ${allow_ports[$x]} -j ACCEPT;
 	((x++)); 
 done
+	echo ""
+	echo "[*] Incoming/Outgoing rules ....... OK"
+	echo ""
 
-	echo "Incoming/Outgoing rules ....... OK"
-	
-
+###################################
+#       LOOP CONFIGURATION        #
+###################################
+#Iterator variable
 x=0
-while [ "$x" != "1" ];
+#Number of ports to create rules
+y=1
+
+while [ "$x" != "$y" ];
 do
-	echo "Creating outgoing rules ...";
-	sudo iptables -A OUTPUT -p tcp --dport ${outgoing_only[$x]} -j ACCEPT;
-	sudo iptables -A OUTPUT -p tcp --sport ${outgoing_only[$x]} -j ACCEPT;
+	echo "[+] Creating outgoing rules ...";
+	iptables -A OUTPUT -p tcp --dport ${outgoing_only[$x]} -j ACCEPT;
+	iptables -A OUTPUT -p tcp --sport ${outgoing_only[$x]} -j ACCEPT;
 	((x++));
 done	
-	echo "Outgoing-only rules ........... OK"
+	echo ""
+	echo "[*] Outgoing-only rules ........... OK"
+	echo ""
 
-
-echo "Changing default policy to DROP ..."
+echo "[*] Changing default policy to DROP ..."
 iptables -P INPUT DROP
 iptables -P OUTPUT DROP
 
-echo "All done."
+echo "[+] All done."
