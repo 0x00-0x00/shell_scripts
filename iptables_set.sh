@@ -63,6 +63,11 @@ uid=$(id -u)
 check_root $uid
 clean_iptables
 
+for arg in "$@"
+do
+	ALLOW_PORTS+=("$arg")
+done
+
 for host in "${SERVER_IP[@]}"
 do
 	echo "[+] Creating ruleset for IP ${host} ..."
