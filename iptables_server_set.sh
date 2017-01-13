@@ -23,7 +23,7 @@ function clean_iptables
 function allow_port 
 {
 	${IPT} -A INPUT -p tcp -d "$2" --sport $1 -m state --state ESTABLISHED -j ACCEPT;
-	${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state ESTABLISHED -j ACCEPT;
+	${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
 	echo "[+] Created new rule: ACCEPT for $1 in CHAIN INPUT."
 	${IPT} -A OUTPUT -p tcp -s "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
 	${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
@@ -32,8 +32,12 @@ function allow_port
 
 function allow_icmp
 {
-	${IPT} -A INPUT -p icmp -d "$1" -j ACCEPT;
-	${IPT} -A OUTPUT -p icmp -s "$1" -j ACCEPT;
+	${IPT} -A INPUT -p icmp --icmp-type 8 -s 0/0 -d "$1" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT;
+	${IPT} -A OUTPUT -p icmp --icmp-type 0 -d 0/0 -s "$1" -m state --state ESTABLISHED,RELATED -j ACCEPT;
+	${IPT} -A OUTPUT -p icmp --icmp-type 8 -s "$1" -d 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT;
+	${IPT} -A INPUT -p icmp --icmp-type 0 -s 0/0 -d "$1" -m state --state ESTABLISHED,RELATED -j ACCEPT;
+
+
 }
 
 function allow_dns
@@ -76,9 +80,9 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
-#for host in "${SERVER_IP[@]}"
-#do
-	host=${SERVER_IP[0]}
+for host in "${SERVER_IP[@]}"
+do
+	#host=${SERVER_IP[0]}
 	echo "[+] Creating ruleset for IP ${host} ..."
 	allow_dns $host
 	allow_icmp $host
@@ -87,7 +91,7 @@ done
 	do
 		allow_port $port $host
 	done
-#done
+done
 
 echo "[+] ${#ALLOW_PORTS[*]} ports were set to permissive rules in iptables."
 
