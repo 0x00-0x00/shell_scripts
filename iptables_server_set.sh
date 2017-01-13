@@ -30,6 +30,12 @@ function allow_port
 	echo "[+] Created new rule: ACCEPT for $1 in CHAIN OUTPUT."
 }
 
+function allow_icmp
+{
+	${IPT} -A INPUT -p icmp -d "$1" -j ACCEPT;
+	${IPT} -A OUTPUT -p icmp -s "$1" -j ACCEPT;
+}
+
 function allow_dns
 {
 	${IPT} -A INPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT;
@@ -75,6 +81,7 @@ done
 	host=${SERVER_IP[0]}
 	echo "[+] Creating ruleset for IP ${host} ..."
 	allow_dns $host
+	allow_icmp $host
 	# Loop array into function
 	for port in "${ALLOW_PORTS[@]}"
 	do
