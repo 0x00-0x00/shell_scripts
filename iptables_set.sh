@@ -6,8 +6,13 @@
 
 # Static variables 
 SERVER_IP=($(hostname -I))
-ALLOW_PORTS=(22 25 53 80 443 3128 5222)
 IPT=$(which iptables)
+
+# Ports to enable
+# Squid-proxy: 3128
+# E-mails: 25, 587, 465, 110, 995
+# HTTP and HTTPS: 80 & 443
+ALLOW_PORTS=(22 25 80 443)
 
 function clean_iptables 
 {
