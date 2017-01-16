@@ -13,6 +13,7 @@ IPT=$(which iptables)
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
 ALLOW_PORTS=(22 25 80 443)
+ALLOWED=(22)
 
 function clean_iptables 
 {
@@ -22,6 +23,13 @@ function clean_iptables
 
 function allow_port 
 {
+    # Check if input port is in ALLOWED_SERVICES variable
+    for port in "${ALLOWED[@]}"
+    do
+        ${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+        ${IPT} -A OUTPUT -p tcp -d "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+    done
+    
 	${IPT} -A INPUT -p tcp -d "$2" --sport $1 -m state --state ESTABLISHED -j ACCEPT;
 	echo "[+] Created new rule: ACCEPT for $1 in CHAIN INPUT."
 	${IPT} -A OUTPUT -p tcp -s "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
