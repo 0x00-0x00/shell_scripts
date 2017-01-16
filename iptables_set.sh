@@ -27,7 +27,7 @@ function allow_port
     for port in "${ALLOWED[@]}"
     do
         ${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-        ${IPT} -A OUTPUT -p tcp -d "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+        ${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
     done
     
 	${IPT} -A INPUT -p tcp -d "$2" --sport $1 -m state --state ESTABLISHED -j ACCEPT;
