@@ -80,6 +80,8 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
 for host in "${SERVER_IP[@]}"
 do
 	#host=${SERVER_IP[0]}
