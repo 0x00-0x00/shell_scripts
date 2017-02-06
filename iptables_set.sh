@@ -5,7 +5,7 @@
 # ------------------------ #
 
 # Static variables 
-SERVER_IP=($(hostname -I))
+SERVER_IP=(192.168.0.125)
 IPT=$(which iptables)
 
 # Ports to enable
@@ -76,6 +76,9 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
+
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
 for host in "${SERVER_IP[@]}"
 do
 	echo "[+] Creating ruleset for IP ${host} ..."
