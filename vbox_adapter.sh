@@ -57,7 +57,7 @@ function create_adapter
 {
     echo "[+] Enabling virtual interface to host system ..."
     echo -n "Virtual host-only adapter: ";
-    if_n=$(ifconfig vboxnet | grep mtu | wc -l)
+    if_n=$(ifconfig vboxnet | grep mtu | wc -l > /dev/null 2>&1)
     if [[ $if_n -gt 0 ]]; then
         echo "OK"
         return 1;
