@@ -6,7 +6,10 @@
 import time
 import subprocess
 import sys
-from _winreg import *
+try:
+    from _winreg import *
+except ImportError:
+    from winreg import *
 
 keyVal = r"Software\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform"
 try:
