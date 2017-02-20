@@ -31,7 +31,7 @@ if [ "$choice" == "+" ]; then
     fi
 
     echo "Ajustando hora para $hora_nova:$resto ...";
-    date +%T -s "$hora_nova:$resto"
+    date +%T -s "$hora_nova:$resto" > /dev/null 2>&1
 
     exit;
 else
@@ -45,7 +45,7 @@ else
     fi
 
     echo "Ajustando hora para $hora_nova:$resto ...";
-    date +%T -s "$hora_nova:$resto"
+    date +%T -s "$hora_nova:$resto" > /dev/null 2>&1
     exit;
 fi
 
