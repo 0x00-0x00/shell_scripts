@@ -31,7 +31,7 @@ function resolv_permissions
              echo "OK";
         fi
      fi
-     perm_folders=(/usr/local/squid/var /dev/shm)
+     perm_folders=(/usr/local/squid/var /dev/shm /var/lib/ssl_db)
      for f in "${perm_folders[@]}";
      do
          echo -n "[*] Changing permission for folder '$f': ";
