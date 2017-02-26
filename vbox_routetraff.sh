@@ -18,7 +18,7 @@ iface02=$2;
 function route_traffic
 {
     echo -n "[*] Creating routing rules: "
-
+    echo "1" > /proc/sys/net/ipv4/ip_forward
     #  Create first rule
     iptables -t nat -A POSTROUTING -o $iface01 -j MASQUERADE;
     if [[ $? != 0 ]]; then
