@@ -2,8 +2,13 @@
 
 uid=$(id -u)
 conf_template=conf/squid/squid.conf
-conf_file=/etc/squid3/squid.conf
-back_file=/etc/squid3/squid.conf.old
+conf_file=/usr/local/squid/etc/squid.conf
+back_file=/usr/local/squid/etc/squid.conf.old
+cert_folder=/usr/local/squid/ssl_cert
+squid_link="http://www.squid-cache.org/Versions/v3/3.5/squid-3.5.24.tar.gz"
+squid_file="squid-3.5.24.tar.gz"
+squid_folder="squid-3.5.24"
+
 
 function check_root
 {
@@ -12,6 +17,60 @@ function check_root
         exit;
     fi
 }
+
+
+function resolv_permissions
+{
+    user_check=$(cat /etc/passwd | grep proxy | wc -l);
+    if [[ $user_check -eq 0 ]]; then
+        echo -n "[*] Creating user 'proxy': ";
+        useradd -U proxy -s /bin/nologin;
+        if [[ $? != 0 ]]; then
+             echo "FAIL";
+        else
+             echo "OK";
+        fi
+     fi
+     perm_folders=(/usr/local/squid/var /dev/shm /var/lib/ssl_db)
+     for f in "${perm_folders[@]}";
+     do
+         echo -n "[*] Changing permission for folder '$f': ";
+         chown -R proxy:proxy "$f";
+         if [[ $? != 0 ]]; then
+             echo "FAIL";
+         else
+             echo "OK";
+         fi
+     done
+
+}
+
+
+function enable_ssl_db
+{
+    echo -n "[*] Initializing SSL data-base: ";
+    /usr/local/squid/libexec/ssl_crtd -c -s /var/lib/ssl_db
+    if [[ $? != 0 ]]; then
+        echo "FAIL";
+    else
+        echo "OK";
+    fi
+}
+
+
+function install_certs
+{
+    if [[ ! -e $cert_folder ]]; then
+        mkdir $cert_folder;
+    fi;
+    cd $cert_folder;
+    if [[ ! -e "myCA.pem" ]]; then
+        echo "[*] Creating CA certificate... ";
+        openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extensions v3_ca -keyout myCA.pem  -out myCA.pem
+    fi
+    cd -;
+}
+
 
 function check_squid
 {
@@ -26,12 +85,21 @@ function check_squid
     fi
 }
 
+
 function install_squid
 {
+    cd /tmp
+    wget $squid_link;
+    tar -xvf $squid_file;
+    cd $squid_folder;
+    ./configure --with-openssl --enable-ssl-crtd
+    make
+    make install
+    ok=$?
     echo -n "[*] Installing squid3: "
-    apt-get install squid3 -y > /dev/null 2>&1
-    if [[ $? == 0 ]]; then
+    if [[ $ok == 0 ]]; then
         echo "OK";
+	ln -s /usr/local/squid/sbin/squid /usr/local/bin/squid
     else
         echo "FAIL";
     fi
@@ -113,20 +181,25 @@ function customize_config
 }
 
 #  Check for necessary privileges
-#check_root
+check_root
 
 #  Check for squid installation
-#check_squid
+check_squid
 
 
 #  If not installed, install it.
-#if [[ $? != 0 ]]; then
-#    install_squid;
-#fi
+if [[ $? != 0 ]]; then
+    install_squid;
+fi
 
 
 # Backup the configuration file
-#backup_conf
+backup_conf
 
 customize_config
 
+install_certs
+
+enable_ssl_db
+
+resolv_permissions
