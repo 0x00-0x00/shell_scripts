@@ -20,6 +20,7 @@ function create_cert
     else
         echo "OK";
     fi
+    # openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
     return 0;
 }
 
