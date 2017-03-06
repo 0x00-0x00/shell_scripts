@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Configuration
-SWAP_LOCATION=/tmp
+SWAP_LOCATION=/
 KB=1024
 
 echo "Swap file creation script"
