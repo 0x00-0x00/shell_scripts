@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Script written by zc00l 
+# Script written by zc00l
 #   De-authenticate clients to capture WPA handshakes
 #   Free License Boys!!
 
@@ -7,10 +7,10 @@
 uid=$(id -u)
 num_packets=3
 
-function check_root 
+function check_root
 {
 	if [ "${uid}" != "0" ]; then
-		echo "[!] Not enough privileges to run this script."
+		echo "[!] Error: Not enough privileges to run this script."
 		exit
     fi
 }
