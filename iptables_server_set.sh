@@ -1,11 +1,16 @@
 #!/bin/bash
 
+GRN='\033[0;92m'
+RED='\033[0;91m'
+YEL='\033[0;93m'
+NO='\033[0m'
+
 # ------------------------ #
 # Script escrito por zc00l #
 # ------------------------ #
 
-# Static variables 
-SERVER_IP=($(hostname -I))
+
+# Iptables binary definition
 IPT=$(which iptables)
 
 # Ports to enable
@@ -13,31 +18,51 @@ IPT=$(which iptables)
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
 ALLOW_PORTS=(22 25 80 443)
+ALLOWED=(22 80 443 5222)
 
-function clean_iptables 
+function get_interface
 {
-	echo "[+] Clearing existing rules ..."
-	${IPT} -F;
+    data=$(route -n);
+    lines=()
+    while read -r line;
+    do
+        lines+=("$line");
+    done <<< "$data";
+
+    for line in "${lines[@]}";
+    do
+        destination=$(echo "$line" | awk {'print $1'})
+        if [ "$destination" == "0.0.0.0" ]; then
+            gw=$(echo "$line" | awk {'print $8'});
+            echo $gw;
+        fi
+    done
 }
 
-function allow_port 
+function get_ip
+{
+    ip=$(ifconfig $(get_interface) | grep -oP '[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}' | head -n1)
+    echo "$ip";
+}
+
+function clean_iptables
+{
+	echo -n "[+] Clearing existing rules: "
+	${IPT} -F;
+    if [[ $? != 0 ]]; then
+        echo -e "${RED}FAIL${NO}";
+        exit;
+    else
+        echo -e "${GRN}OK${NO}";
+    fi
+}
+
+function allow_port
 {
 	${IPT} -A INPUT -p tcp -d "$2" --sport $1 -m state --state ESTABLISHED -j ACCEPT;
-	${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-	echo "[+] Created new rule: ACCEPT for $1 in CHAIN INPUT."
+	echo -e "[+] Created new rule: ${GRN}ACCEPT${NO} for $1 in CHAIN INPUT."
 	${IPT} -A OUTPUT -p tcp -s "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-	${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-	echo "[+] Created new rule: ACCEPT for $1 in CHAIN OUTPUT."
-}
-
-function allow_icmp
-{
-	${IPT} -A INPUT -p icmp --icmp-type 8 -s 0/0 -d "$1" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT;
-	${IPT} -A OUTPUT -p icmp --icmp-type 0 -d 0/0 -s "$1" -m state --state ESTABLISHED,RELATED -j ACCEPT;
-	${IPT} -A OUTPUT -p icmp --icmp-type 8 -s "$1" -d 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT;
-	${IPT} -A INPUT -p icmp --icmp-type 0 -s 0/0 -d "$1" -m state --state ESTABLISHED,RELATED -j ACCEPT;
-
-
+	echo -e "[+] Created new rule: ${GRN}ACCEPT${NO} for $1 in CHAIN OUTPUT."
 }
 
 function allow_dns
@@ -46,33 +71,51 @@ function allow_dns
 	${IPT} -A OUTPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT;
 	${IPT} -A OUTPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT;
 	${IPT} -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT;
-	echo "[+] Created ruleset for DNS queries for IP $1."
+	echo -e "[+] Created ruleset for ${YEL}DNS queries${NO} for IP $1."
 }
 
-function check_root 
+function check_root
 {
 	if [ "$1" != "0" ]; then
-		echo "[!] You lack privileges to run this script."
+        echo -e "${RED}FAIL${NO}";
+		echo -e "[!] ${RED}ERROR${NO}: You lack privileges to run this script."
 		exit
+    else
+        echo -e "${GRN}OK${NO}"
 	fi
 }
 
 function enable_log
 {
 	${IPT} -A INPUT -j LOG -m limit --limit 12/min --log-level 4 --log-prefix 'INPUT drop:'
-	echo "[+] Logging enabled for chain INPUT."
+	echo -e "[+] Logging ${GRN}enabled${NO} for chain INPUT."
 	${IPT} -A INPUT -j DROP
-	echo "[+] Chain INPUT set to DROP."
+	echo -e "[+] Chain INPUT set to ${RED}DROP${NO}."
 	${IPT} -A OUTPUT -j LOG -m limit --limit 12/min --log-level 4 --log-prefix 'OUTPUT drop: '
-	echo "[+] Logging enabled for chain OUTPUT."
+	echo -e "[+] Logging ${GRN}enabled${NO} for chain OUTPUT."
 	${IPT} -A OUTPUT -j DROP
-	echo "[+] Chain OUTPUT set to DROP."
+	echo -e "[+] Chain OUTPUT set to ${RED}DROP${NO}."
 }
 
 # Script init
-echo "[*] Checking privileges ..."
+echo -n "[*] Checking privileges: "
 uid=$(id -u)
 check_root $uid
+
+ip=$(get_ip);
+echo -n "[*] Resolving IP address: ";
+echo $ip;
+echo -n "Is this information correct? [y/N]";
+read k;
+if [ "$k" == "y" ] || [ "$k" == "Y" ]; then
+    echo "[*] Setting IP to $ip.";
+else
+    echo "[!] Aborting program."
+    exit;
+fi
+
+
+SERVER_IP=("$ip");
 clean_iptables
 
 for arg in "$@"
@@ -80,26 +123,32 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
-iptables -A INPUT -i lo -j ACCEPT
-iptables -A OUTPUT -o lo -j ACCEPT
 for host in "${SERVER_IP[@]}"
 do
-	#host=${SERVER_IP[0]}
 	echo "[+] Creating ruleset for IP ${host} ..."
 	allow_dns $host
-	allow_icmp $host
 	# Loop array into function
 	for port in "${ALLOW_PORTS[@]}"
 	do
 		allow_port $port $host
 	done
+	
+	# Check if input port is in ALLOWED_SERVICES variable
+    	for port in "${ALLOWED[@]}"
+    	do
+        	${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+        	${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+    	done
+
+
+
 done
 
 echo "[+] ${#ALLOW_PORTS[*]} ports were set to permissive rules in iptables."
 
 enable_log
 
-echo "[X] End of script."
+echo -e "[X] \033[0;1mEnd of script${NO}."
 exit
 
 
