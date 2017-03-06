@@ -22,24 +22,24 @@ function route_traffic
     #  Create first rule
     iptables -t nat -A POSTROUTING -o $iface01 -j MASQUERADE;
     if [[ $? != 0 ]]; then
-        echo "\033[33mFAIL\033[0m";
+        echo -e "\033[33mFAIL\033[0m";
         exit;
     fi
 
     #  Create second rule
     iptables -A FORWARD -i $iface01 -o $iface02 -m state --state RELATED,ESTABLISHED -j ACCEPT;
     if [[ $? != 0 ]]; then
-        echo "\033[33mFAIL\033[0m";
+        echo -e "\033[33mFAIL\033[0m";
         exit;
     fi
 
     #  Create third rule
     iptables -A FORWARD -i $iface02 -o $iface01 -j ACCEPT;
     if [[ $? != 0 ]]; then
-        echo "\033[33mFAIL\033[0m";
+        echo -e "\033[33mFAIL\033[0m";
         exit;
     else
-        echo "\033[32mOK\033[0m";
+        echo -e "\033[32mOK\033[0m";
         exit;
     fi
 }
