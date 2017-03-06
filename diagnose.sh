@@ -3,12 +3,6 @@
 # Generate informative report about linux system specifications
 #
 
-uid=$(id -u);
-if [[ $uid != 0 ]]; then
-    echo "[!] Error: Not enough privileges to run this script.";
-    exit;
-fi
-
 
 #  Header function to padronize output
 function header
