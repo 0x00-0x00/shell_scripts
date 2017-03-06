@@ -59,13 +59,6 @@ function clean_iptables
 
 function allow_port
 {
-    # Check if input port is in ALLOWED_SERVICES variable
-    for port in "${ALLOWED[@]}"
-    do
-        ${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-        ${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-    done
-
 	${IPT} -A INPUT -p tcp -d "$2" --sport $1 -m state --state ESTABLISHED -j ACCEPT;
 	echo -e "[+] Created new rule: ${GRN}ACCEPT${NO} for $1 in CHAIN INPUT."
 	${IPT} -A OUTPUT -p tcp -s "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
@@ -139,6 +132,16 @@ do
 	do
 		allow_port $port $host
 	done
+	
+	# Check if input port is in ALLOWED_SERVICES variable
+    	for port in "${ALLOWED[@]}"
+    	do
+        	${IPT} -A INPUT -p tcp -d "$host" --dport $port -m state --state NEW,ESTABLISHED -j ACCEPT;
+        	${IPT} -A OUTPUT -p tcp -s "$host" --sport $port -m state --state NEW,ESTABLISHED -j ACCEPT;
+    	done
+
+
+
 done
 
 echo "[+] ${#ALLOW_PORTS[*]} ports were set to permissive rules in iptables."

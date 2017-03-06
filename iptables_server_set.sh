@@ -136,10 +136,11 @@ do
 	done
 	
 	# Check if input port is in ALLOWED_SERVICES variable
+	# This is what do the firewall to accept NEW connections and establish server abilities with clients.
     	for port in "${ALLOWED[@]}"
     	do
-        	${IPT} -A INPUT -p tcp -d "$2" --dport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
-        	${IPT} -A OUTPUT -p tcp -s "$2" --sport $1 -m state --state NEW,ESTABLISHED -j ACCEPT;
+        	${IPT} -A INPUT -p tcp -d "$host" --dport $port -m state --state NEW,ESTABLISHED -j ACCEPT;
+        	${IPT} -A OUTPUT -p tcp -s "$host" --sport $port -m state --state NEW,ESTABLISHED -j ACCEPT;
     	done
 
 
