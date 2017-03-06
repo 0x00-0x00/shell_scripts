@@ -20,7 +20,7 @@ IPT=$(which iptables)
 # HTTP and HTTPS: 80 & 443
 # Socket data transference: 5222
 ALLOW_PORTS=(22 25 80 443)
-ALLOWED=(22 80 139 443 445 5222)
+ALLOWED=(22 80 139 443 445 3128 5222)
 
 function get_interface
 {
