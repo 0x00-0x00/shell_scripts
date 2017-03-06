@@ -15,6 +15,16 @@ function check_root
     fi
 }
 
+function check_aircrack
+{
+	#  check if the tool is on PATH
+	app=$(which aireplay-ng);
+	if [[ ! -e $app ]]; then
+		echo "\033[091mError\033[0m: aireplay-ng is not installed.";
+		exit;
+	fi
+}
+
 function check_args
 {
     i=0
@@ -34,7 +44,8 @@ function check_args
 
 
 
-check_root
+check_root;
+check_aircrack;
 status=check_args ${1} ${2}
 if [ "$status" == "0" ]; then
     echo "[+] Sending command to deauth client ${2} from the AP ${1} ..."
