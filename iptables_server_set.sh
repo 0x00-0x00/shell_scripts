@@ -14,11 +14,13 @@ NO='\033[0m'
 IPT=$(which iptables)
 
 # Ports to enable
+# Samba: 139 & 445
 # Squid-proxy: 3128
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
+# Socket data transference: 5222
 ALLOW_PORTS=(22 25 80 443)
-ALLOWED=(22 80 443 5222)
+ALLOWED=(22 80 139 443 445 5222)
 
 function get_interface
 {
