@@ -37,6 +37,7 @@ function get_interface
         if [ "$destination" == "0.0.0.0" ]; then
             gw=$(echo "$line" | awk {'print $8'});
             echo $gw;
+            return;
         fi
     done
 }
@@ -103,7 +104,6 @@ function enable_log
 echo -n "[*] Checking privileges: "
 uid=$(id -u)
 check_root $uid
-
 ip=$(get_ip);
 echo -n "[*] Resolving IP address: ";
 echo $ip;
