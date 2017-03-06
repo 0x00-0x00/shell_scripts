@@ -1,7 +1,36 @@
 #!/bin/bash
 # Script by zc00l
 # Generate informative report about linux system specifications
-#
+
+
+
+#  Some complementary functions about networking information
+function get_interface
+{
+    data=$(route -n);
+    lines=()
+    while read -r line;
+    do
+        lines+=("$line");
+    done <<< "$data";
+
+    for line in "${lines[@]}";
+    do
+        destination=$(echo "$line" | awk {'print $1'})
+        if [ "$destination" == "0.0.0.0" ]; then
+            gw=$(echo "$line" | awk {'print $8'});
+            echo $gw;
+	    return;
+        fi
+    done
+}
+
+function get_ip
+{
+    ip=$(ifconfig $(get_interface) | grep -oP '[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}' | head -n1)
+    echo "$ip";
+}
+
 
 
 #  Header function to padronize output
@@ -47,7 +76,25 @@ function gather_disk
 }
 
 
+function gather_network
+{
+    interface=$(get_interface);
+    ip=$(get_ip);
+    if [[ $(id -u) == 0 ]]; then
+        adapter=$(lspci | grep -i network | sed  \
+        's/[0-9]*:[0-9]*\.[0-9]*\s*Network controller:\s//');
+    else
+        adapter="Not enough privileges to show this information.";
+    fi
+
+    header "Network"
+    echo "Act. Iface ...: ${iface}";
+    echo "Current IP ...: ${ip}";
+    echo "Network Adapt : ${adapter}";
+}
+
 
 gather_cpu
 gather_mem
 gather_disk
+gather_network
