@@ -5,9 +5,9 @@ function ip_forward
     echo -n "[*] Setting kernel to forward packets: "
     echo 1 > /proc/sys/net/ipv4/ip_forward;
     if [[ $? == 0 ]]; then
-        echo "\033[32mOK\033[0m";
+        echo -e "\033[32mOK\033[0m";
     else
-        echo "\033[33mFAIL\033[0m";
+        echo -e "\033[33mFAIL\033[0m";
     fi
 }
 
