@@ -17,7 +17,7 @@ IPT=$(which iptables)
 # Squid-proxy: 3128
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
-ALLOW_PORTS=(22 25 80 443)
+ALLOW_PORTS=(22 25 80 443 8080 5222)
 ALLOWED=(22)
 
 function get_interface
