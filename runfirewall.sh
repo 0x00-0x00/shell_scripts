@@ -1,6 +1,12 @@
 #!/bin/bash
+# Script escrito por Andre Marques (zc00l)
+#  RunFireWall serve de script de gatilho,
+#  para outro script, ativador de firewall.
+#  Faz a checagem de processos para a habilitacao/desabilitacao
+#  do firewall em momentos distintos.
+##
 
-# Defines
+# Statically defined variables
 uid=$(id -u);
 
 function report_status
@@ -71,7 +77,23 @@ function activate_firewall
 }
 
 
+#  Processos que, quando detectados, desabilitam o firewall
+function check_banned_processes
+{
+    banned=("sshuttle");
+    for program in "${banned[@]}"; do
+        n=$(ps -A | grep $program | wc -l);
+        if [[ $n -gt 0 ]]; then
+            error "Process ${program} detected. Deactivating firewall...";
+            exit 1;
+        fi
+    done
+    return 0;
+}
+
+
 check_root;
 check_firewall_presence;
 free_firewall
+check_banned_processes
 activate_firewall
