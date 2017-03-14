@@ -80,7 +80,7 @@ function activate_firewall
 #  Processos que, quando detectados, desabilitam o firewall
 function check_banned_processes
 {
-    banned=("sshuttle");
+    banned=("sshuttle" "aria2c");
     for program in "${banned[@]}"; do
         n=$(ps -A | grep $program | wc -l);
         if [[ $n -gt 0 ]]; then
