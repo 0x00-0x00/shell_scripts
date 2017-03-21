@@ -31,7 +31,7 @@ while getops "s:" opt; do
     esac
 done
 
-sed "s/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/${SERVER_DNS}/g" /etc/resolv.conf
+sed -i "s/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/${SERVER_DNS}/g" /etc/resolv.conf
 if [[ $? == 0 ]]; then
     log "DNS alterado com sucesso!";
 else
