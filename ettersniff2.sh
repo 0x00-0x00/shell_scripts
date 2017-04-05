@@ -70,7 +70,7 @@ function generate_tmp_file {
 
 
 function delete_traces {
-    if [[ $tmp_file == "" ]]; then
+    if [[ $tmp_file != "" ]] && [[ -f $tmp_file ]]; then
         shred -uz $tmp_file;
         if [[ $? == 0 ]]; then
             log "Temporary file deleted.";
