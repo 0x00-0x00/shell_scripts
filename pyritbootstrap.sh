@@ -1,5 +1,16 @@
 #!/bin/bash
 
+function report_status
+{
+    if [[ $1 == 0 ]]; then
+		echo -e "\033[092mSUCCESS\033[0m";
+	else
+		echo -e "\033[091mFAILED\033[0m";
+	fi
+	return 0;
+}
+
+aa
 uid=$(uid -u)
 if [ "$uid" != "0" ]; then
 	echo "You need administrative privileges to run this script."
@@ -11,8 +22,9 @@ MAIN_FOLDER=/opt/Pyrit
 OPENCL_FOLDER=${MAIN_FOLDER}/modules/cpyrit_opencl
 
 cd /opt
-echo "[+] Cloning repository from remote ... "
+echo -n "[+] Cloning repository from remote: "
 git clone ${REPO_LINK} > /dev/null 2>&1
+
 
 echo "[+] Installing dependencies ... "
 apt-get install python-dev opencl-headers libssl-dev ocl-icd-opencl-dev libpcap-dev -y > /dev/null 2>&1
