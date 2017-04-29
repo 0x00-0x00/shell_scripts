@@ -90,11 +90,11 @@ function enable_log
 {
 	${IPT} -A INPUT -j LOG -m limit --limit 12/min --log-level 4 --log-prefix 'INPUT drop:'
 	echo -e "[+] Logging ${GRN}enabled${NO} for chain INPUT."
-	${IPT} -A INPUT -j DROP
+	${IPT} -P INPUT DROP
 	echo -e "[+] Chain INPUT set to ${RED}DROP${NO}."
 	${IPT} -A OUTPUT -j LOG -m limit --limit 12/min --log-level 4 --log-prefix 'OUTPUT drop: '
 	echo -e "[+] Logging ${GRN}enabled${NO} for chain OUTPUT."
-	${IPT} -A OUTPUT -j DROP
+	${IPT} -P OUTPUT DROP
 	echo -e "[+] Chain OUTPUT set to ${RED}DROP${NO}."
 }
 
