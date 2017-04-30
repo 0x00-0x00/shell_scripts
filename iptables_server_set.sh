@@ -77,6 +77,11 @@ function allow_dns
 	echo -e "[+] Created ruleset for ${YEL}DNS queries${NO} for IP $1."
 }
 
+function allow_icmp {
+    ${IPT} -A INPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT:
+    ${IPT} -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT;
+}
+
 function check_root
 {
 	if [ "$1" != "0" ]; then
@@ -125,6 +130,7 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
+allow_icmp;
 for host in "${SERVER_IP[@]}"
 do
 	echo "[+] Creating ruleset for IP ${host} ..."
@@ -134,7 +140,6 @@ do
 	do
 		allow_port $port $host
 	done
-	
 	# Check if input port is in ALLOWED_SERVICES variable
 	# This is what do the firewall to accept NEW connections and establish server abilities with clients.
     	for port in "${ALLOWED[@]}"

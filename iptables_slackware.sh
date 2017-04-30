@@ -17,7 +17,7 @@ IPT=$(which iptables)
 # Squid-proxy: 3128
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
-ALLOW_PORTS=(22 25 80 443 3128 8080 5222)
+ALLOW_PORTS=(22 80 443 3128 8080 5222 9050)
 ALLOWED=(22)
 
 function get_interface
@@ -75,6 +75,13 @@ function allow_dns
 	echo -e "[+] Created ruleset for ${YEL}DNS queries${NO} for IP $1."
 }
 
+function allow_icmp {
+    ${IPT} -A INPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT;
+    ${IPT} -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT;
+    return 0;
+}
+
+
 function check_root
 {
 	if [ "$1" != "0" ]; then
@@ -124,16 +131,16 @@ do
 	ALLOW_PORTS+=("$arg")
 done
 
+allow_icmp;  # allow icmp packets
 for host in "${SERVER_IP[@]}"
 do
 	echo "[+] Creating ruleset for IP ${host} ..."
-	allow_dns $host
+	allow_dns $host;
 	# Loop array into function
 	for port in "${ALLOW_PORTS[@]}"
 	do
 		allow_port $port $host
 	done
-	
 	# Check if input port is in ALLOWED_SERVICES variable
     	for port in "${ALLOWED[@]}"
     	do
