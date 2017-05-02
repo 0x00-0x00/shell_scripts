@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    return_code = system("iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD; iptables -F");
+    return_code = system("iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT; iptables -F");
     if ( return_code != 0 ) {
         fprintf(stdout, "ERROR: Could not free the iptables rules.\n");
         exit(1);
