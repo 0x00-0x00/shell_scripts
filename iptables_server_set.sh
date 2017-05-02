@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 GRN='\033[0;92m'
 RED='\033[0;91m'
@@ -78,7 +78,7 @@ function allow_dns
 }
 
 function allow_icmp {
-    ${IPT} -A INPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT:
+    ${IPT} -A INPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT;
     ${IPT} -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT;
 }
 
