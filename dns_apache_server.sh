@@ -8,8 +8,8 @@ fi
 # ---=========================================--- #
 # 		CONFIGURACAO DE DNS 
 # ---=========================================--- #
-HOST_ZONE_NAME="carambola"
-PRIMARY_ZONE="carambola.com.br"  # zona primaria
+HOST_ZONE_NAME="watchers"
+PRIMARY_ZONE="watchers.com.br"  # zona primaria
 
 NS=("ip1" "ip2"); # servidores NS
 MX=("ip3"); # servidores MX
