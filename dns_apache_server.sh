@@ -35,7 +35,7 @@ chkerr()
 }
 
 echo "[+] Instalando bind9 e apache2 ...";
-# apt-get install bind9 apache2 apache2-utils -y > /dev/null 2>&1
+apt-get install bind9 apache2 apache2-utils -y > /dev/null 2>&1
 chkerr;
 
 echo "[+] BIND9: Checando e configurando bind9 ...";
