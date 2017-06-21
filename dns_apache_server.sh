@@ -142,7 +142,7 @@ if [[ ! -d $SITE_DIR ]]; then
 	sed -i "s/\/var\/www/$ESCAPED_SITE_DIR/g" /etc/apache2/apache2.conf
 	i=0;
 
-	echo "[+] Habilitando modulo de SSL do apache2 ...";
+	echo "[+] APACHE2: Habilitando modulo de SSL do apache2 ...";
 	a2enmod ssl > /dev/null 2>&1
 	if [[ ! -d /etc/apache2/ssl ]]; then
 		mkdir -p /etc/apache2/ssl
@@ -214,10 +214,10 @@ RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]" > $SITE_DIR/$SITE/.htaccess
 		chown root.root $SITE_DIR/$SITE/.htaccess
 		
 		
-		echo -e "[+] Habilitando o site '$SITE' ...";
+		echo -e "[+] APACHE2: Habilitando o site '$SITE' ...";
 		a2ensite "$SITE" > /dev/null 2>&1
 
 	done
-	echo "[+] Reiniciando apache2 ...";
+	echo "[+] APACHE2: Reiniciando apache2 ...";
 	systemctl restart apache2
 fi
