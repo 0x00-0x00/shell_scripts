@@ -76,7 +76,7 @@ function check_squid
 {
     echo -n "[*] Checking squid installation: "
     which squid3 -v > /dev/null 2>&1
-    if [[ $? != 0 ]]; then
+    if [[ $? == 0 ]]; then
         echo "INSTALLED";
         return 0;
     else
