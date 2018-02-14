@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 GRN='\033[0;92m'
 RED='\033[0;91m'
@@ -19,8 +19,8 @@ IPT=$(which iptables)
 # E-mails: 25, 587, 465, 110, 995
 # HTTP and HTTPS: 80 & 443
 # Socket data transference: 5222
-ALLOW_PORTS=(22 25 80 443)
-ALLOWED=(22 80 139 443 445 3128 5222)
+ALLOW_PORTS=(22 25 80 443 1337)
+ALLOWED=(22 80 139 443 445 3128 5222 1337)
 
 function get_interface
 {
@@ -74,6 +74,10 @@ function allow_dns
 	${IPT} -A OUTPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT;
 	${IPT} -A OUTPUT -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT;
 	${IPT} -A INPUT -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT;
+    ${IPT} -A INPUT -p udp --sport 1337 -m state --state NEW,ESTABLISHED -j ACCEPT;
+    ${IPT} -A OUTPUT -p udp --sport 1337 -m state --state NEW,ESTABLISHED -j ACCEPT;
+    ${IPT} -A INPUT -p udp --dport 1337 -m state --state NEW,ESTABLISHED -j ACCEPT;
+    ${IPT} -A OUTPUT -p udp --dport 1337 -m state --state NEW,ESTABLISHED -j ACCEPT;
 	echo -e "[+] Created ruleset for ${YEL}DNS queries${NO} for IP $1."
 }
 
